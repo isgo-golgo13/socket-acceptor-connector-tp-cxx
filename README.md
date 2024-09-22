@@ -2,6 +2,14 @@
 C++20 POSA 2 Socket Acceptor-Connector Design Pattern for Client and Server using Thread-Pool (TP) from ACE C++ Framework
 
 
+## Thread Per-Connection vs Thread Pool Differences
+
+The following are the differences of Thread Per-Connection vs Thread Pool.
+
+- Thread Pool: The server will now create a fixed number of threads at startup. These threads will pull tasks (client sessions) from a queue.
+
+- Task Queue: The server will use a std::deque for storing tasks (client connections), and a worker thread from the pool will pick up tasks from this queue.
+
 ## Compiling the Project
 
 ```shell
