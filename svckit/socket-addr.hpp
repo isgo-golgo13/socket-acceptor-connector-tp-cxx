@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <arpa/inet.h>
 
 class SocketAddr {
 public:
