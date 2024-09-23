@@ -60,59 +60,7 @@ The project structure is as follows.
 
 ## Fix Changelist
 
-- Fix class `SockAddr` in socket-addr.hpp and .cpp to include `struct sockaddr_in` as a private instance to the class and SockAddr is an API facade for struct sockaddr_in. This change will fix this code.
+- Fix class `SockAddr` in socket-addr.hpp and .cpp to include `struct sockaddr_in` as a private instance to the class and SockAddr is an API facade for struct sockaddr_in.
 
-```c++
 
-class SocketAddr {
-public:
-    SocketAddr() = default;
-    SocketAddr(const std::string& ip, int port);
-    SocketAddr(const SocketAddr& other) = default;
-    SocketAddr(SocketAddr&& other) noexcept = default;
-    SocketAddr& operator=(const SocketAddr& other) = default;
-    SocketAddr& operator=(SocketAddr&& other) noexcept = default;
-    ~SocketAddr() = default;
-
-    [[nodiscard]] std::string getIp() const;
-    [[nodiscard]] int getPort() const;
-
-private:
-    struct sockaddr_in sockaddr_in_; //API delegates to this. 
-    std::string ip_;
-    int port_;
-};
-
-```
-Will change this that follows.
-
-```c++
-void SocketConnector::connect() {
-    struct sockaddr_in serverAddr;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(serverAddr_.getPort());
-    serverAddr.sin_addr.s_addr = inet_addr(serverAddr_.getIp().c_str());
-
-    if (::connect(clientSocket_, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-        std::cerr << "Connection failed!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-}
-```
-
-To this.
-
-```c++
-void SocketConnector::connect() {
-   
-    this->serverAddr_.sockaddr_in_.sin_family = AF_INET;
-    this->serverAddr_.sockaddr_in_.sin_port = htons(serverAddr_.getPort());
-    this->serverAddr_.sockaddr_in_.sin_addr.s_addr = inet_addr(serverAddr_.getIp().c_str());
-
-    if (::connect(clientSocket_, (struct sockaddr*)&serverAddr_, sizeof(serverAddr_)) < 0) {
-        std::cerr << "Connection failed!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-}
-```
 

@@ -23,6 +23,15 @@ void SocketConnector::connect() {
     }
 }
 
+//TODO: change to this from above
+// void SocketConnector::connect() {
+ 
+//     if (::connect(clientSocket_, (struct sockaddr*)&serverAddr_.getAddr(), sizeof(serverAddr_.getAddr())) < 0) {
+//         std::cerr << "Connection failed!" << std::endl;
+//         exit(EXIT_FAILURE);
+//     }
+// }
+
 void SocketConnector::sendData(const void* buffer, size_t length) {
     socket_->send(clientSocket_, buffer, length);
 }
