@@ -1,6 +1,7 @@
 #include "socket-connector.hpp"
 #include "socket-addr.hpp"
 #include <iostream>
+#include <thread>
 #include <memory>
 
 constexpr int SESSION_COUNT = 6;  // Number of client sessions
