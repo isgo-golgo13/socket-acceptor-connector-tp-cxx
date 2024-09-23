@@ -58,9 +58,66 @@ The project structure is as follows.
 ```
 
 
+
+## Running the Client and Server in Docker
+
+Provided in the project is the `docker-compose.yaml` file.
+The socket client and socket server run over a `thread_pool_network` Docker network bridge.
+
+
+```yaml
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: thread_pool_server
+    ports:
+      - "8080:8080"  # Expose server port
+    networks:
+      - thread_pool_network
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: thread_pool_client
+    depends_on:
+      - server  # Ensure the server starts before the client
+    networks:
+      - thread_pool_network
+    environment:
+      SERVER_HOST: "server"  # The server's hostname
+      SERVER_PORT: "8080"    # Port to connect to
+
+networks:
+  thread_pool_network:
+    driver: bridge
+```
+
+To run the client and server do the following.
+
+```shell
+docker-compose --build up
+```
+
+To stop the client and server do the following.
+
+```shell
+docker-compose down
+```
+
+
+
 ## Fix Changelist
 
 - Fix class `SockAddr` in socket-addr.hpp and .cpp to include `struct sockaddr_in` as a private instance to the class and SockAddr is an API facade for struct sockaddr_in.
+
+See the commented out code to turn on these changes in the following files.
+- socket-addr.h, socket-addr.cpp, socket-connector.cpp
+
 
 
 
