@@ -1,39 +1,47 @@
 #include "socket-connector.hpp"
 #include "socket-addr.hpp"
 #include <iostream>
+#include <vector>
+#include <string>
 #include <thread>
-#include <memory>
+#include <chrono>
 
-constexpr int SESSION_COUNT = 6;  // Number of client sessions
-constexpr auto PAYLOAD = "Payload 00000000000000001";  // Data to send
+constexpr int SESSION_COUNT = 100;
 constexpr int BUFFER_SIZE = 1024;
 constexpr int PORT = 8080;
 
-void sendSession() {
+void sendTask(int clientID) {
+    // Use std::string for payload
+    std::string payload_str = "Payload-" + std::to_string(clientID);
+    std::vector<char> payload(payload_str.begin(), payload_str.end());
+
     // Create and connect SocketConnector
     SocketAddr addr("127.0.0.1", PORT);
     SocketConnector connector(addr);
     connector.connect();
 
     // Send data
-    connector.sendData(PAYLOAD, strlen(PAYLOAD));
+    connector.sendData(payload);
 
     // Receive response
-    char buffer[BUFFER_SIZE];
-    connector.recvData(buffer, sizeof(buffer));
-    std::cout << "Received from server: " << buffer << std::endl;
+    std::vector<char> buffer(BUFFER_SIZE);
+    connector.recvData(buffer);
+    std::cout << "Client " << clientID << " received from server: " << std::string(buffer.data(), buffer.size()) << std::endl;
 }
 
 int main() {
-    std::vector<std::thread> sessions;
-    sessions.reserve(SESSION_COUNT);
+    std::vector<std::thread> threadPool;
+    threadPool.reserve(SESSION_COUNT);
 
+    // Launch threads in the pool
     for (int i = 0; i < SESSION_COUNT; ++i) {
-        sessions.emplace_back(sendSession);
+        threadPool.emplace_back(sendTask, i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Simulate staggered connections
     }
 
-    for (auto& session : sessions) {
-        session.join();
+    // Wait for all threads to complete
+    for (auto& thread : threadPool) {
+        thread.join();
     }
 
     return 0;

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 
+
 SocketConnector::SocketConnector(const SocketAddr& addr) : serverAddr_(addr), clientSocket_(socket(AF_INET, SOCK_STREAM, 0)) {
     if (clientSocket_ == -1) {
         std::cerr << "Socket creation failed!" << std::endl;
@@ -23,24 +24,14 @@ void SocketConnector::connect() {
     }
 }
 
-//TODO: change to this from above
-// void SocketConnector::connect() {
- 
-//     if (::connect(clientSocket_, (struct sockaddr*)&serverAddr_.getAddr(), sizeof(serverAddr_.getAddr())) < 0) {
-//         std::cerr << "Connection failed!" << std::endl;
-//         exit(EXIT_FAILURE);
-//     }
-// }
-
 std::unique_ptr<Socket> SocketConnector::getSocket() {
     return std::move(socket_);
 }
 
-
-void SocketConnector::sendData(const void* buffer, size_t length) {
-    socket_->send(clientSocket_, buffer, length);
+void SocketConnector::sendData(const std::vector<char>& buffer) {
+    socket_->send(clientSocket_, buffer);
 }
 
-void SocketConnector::recvData(void* buffer, size_t length) {
-    socket_->recv(clientSocket_, buffer, length);
+void SocketConnector::recvData(std::vector<char>& buffer) {
+    socket_->recv(clientSocket_, buffer);
 }
